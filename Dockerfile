@@ -17,6 +17,8 @@ RUN \
 
 RUN mkdir -p /var/log/supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY watcher.sh /run/watcher.sh
+RUN /bin/chmod +x /run/watcher.sh
 
 # Define mountable directories.
 VOLUME ["/data", "/etc/nginx/sites-enabled", "/var/log/nginx"]
