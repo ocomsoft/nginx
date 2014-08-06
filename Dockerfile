@@ -11,9 +11,12 @@ FROM dockerfile/ubuntu
 RUN \
   add-apt-repository -y ppa:nginx/stable && \
   apt-get update && \
-  apt-get install -y nginx && \
+  apt-get install -y nginx supervisor inotify-tools && \
   echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
   chown -R www-data:www-data /var/lib/nginx
+
+RUN mkdir -p /var/log/supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Define mountable directories.
 VOLUME ["/data", "/etc/nginx/sites-enabled", "/var/log/nginx"]
@@ -22,7 +25,8 @@ VOLUME ["/data", "/etc/nginx/sites-enabled", "/var/log/nginx"]
 WORKDIR /etc/nginx
 
 # Define default command.
-CMD ["nginx"]
+#CMD ["nginx"]
+CMD ["/usr/bin/supervisord"]
 
 # Expose ports.
 EXPOSE 80
