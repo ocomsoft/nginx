@@ -41,7 +41,7 @@ for cont in containers:
 # print mappings
 templateLoader = jinja2.FileSystemLoader( searchpath="/" )
 templateEnv = jinja2.Environment( loader=templateLoader )
-TEMPLATE_FILE = "/home/ocom/docker/reverseProxy.conf.tmpl"
+TEMPLATE_FILE = "/home/ocom/docker/nginx/reverseProxy.conf.tmpl"
 template = templateEnv.get_template( TEMPLATE_FILE )
 
 #template = Template ("""HostName: {{hostname}} for {% for map in maps %} {{ map.ipaddress }}:{{ map.internalPort }}, {% endfor %}""");
