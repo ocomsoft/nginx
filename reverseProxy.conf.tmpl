@@ -1,0 +1,58 @@
+
+# HostName: {{hostname}} 
+#	{% for map in maps %} {{ map.ipaddress }}:{{ map.internalPort }}
+#	{% endfor %}
+
+upstream up_{{shortHostName}} {
+	ip_hash;
+
+	{% for map in maps %} server {{ map.ipaddress }}:{{ map.internalPort }};
+	{% endfor %}
+}
+
+server {
+   listen 0.0.0.0:80;
+
+   server_name {{hostname}};
+
+
+   location /host-manager {
+        return 404;
+   }
+   location /manager {
+        return 404;
+   }
+
+   location /cp {
+        return 404;
+   }
+
+   access_log /srv/www/proxy/{{shortHostName}}.access.log;
+   error_log /srv/www/proxy/{{shortHostName}}.error.log;
+
+   location / {
+        proxy_pass  		http://up_{{shortHostName}}
+        proxy_set_header 	Host $host:$proxy_port;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+
+	proxy_set_header X-Forwarded-Proto $scheme;
+        add_header Front-End-Https on;
+
+        proxy_read_timeout 5600;
+
+        ### force timeouts if one of backend is died ##
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+
+        ### By default we don't want to redirect it ####
+        proxy_redirect off;
+
+        proxy_intercept_errors off;
+
+        client_max_body_size 30m;
+
+        #error_page 502 /etc/nginx/500.html;
+
+  }
+}
+
